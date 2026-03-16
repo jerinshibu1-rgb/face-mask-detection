@@ -9,9 +9,12 @@ from tensorflow.keras.preprocessing import image
 MODEL_URL = "https://drive.google.com/uc?id=1RO4StXQV0cPROkz5vDzdIbsCxKVcPFjl"
 MODEL_PATH = "cnn_facemask.keras"
 
-if not os.path.exists(MODEL_PATH):
-    print("Downloading model from Google Drive...")
-    gdown.download(MODEL_URL, MODEL_PATH, quiet=False)
+# Always download fresh model in cloud (avoids corrupted file)
+if os.path.exists(MODEL_PATH):
+    os.remove(MODEL_PATH)
+
+print("Downloading model from Google Drive...")
+gdown.download(MODEL_URL, MODEL_PATH, quiet=False, fuzzy=True)
 
 print("Loading CNN model...")
 model = tf.keras.models.load_model(MODEL_PATH)
