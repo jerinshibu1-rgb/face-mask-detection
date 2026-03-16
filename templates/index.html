@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>AI Face Mask Detection</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+
+body{
+    margin:0;
+    font-family:Poppins, sans-serif;
+    background: linear-gradient(135deg,#667eea,#764ba2);
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.container{
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(15px);
+    padding:40px;
+    border-radius:20px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.3);
+    width:380px;
+    text-align:center;
+    color:white;
+}
+
+h1{
+    margin-bottom:10px;
+    font-weight:600;
+}
+
+.subtitle{
+    font-size:14px;
+    opacity:0.8;
+    margin-bottom:25px;
+}
+
+.upload-box{
+    border:2px dashed rgba(255,255,255,0.6);
+    padding:20px;
+    border-radius:15px;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.upload-box:hover{
+    background:rgba(255,255,255,0.1);
+}
+
+input[type=file]{
+    display:none;
+}
+
+button{
+    margin-top:20px;
+    padding:12px 25px;
+    border:none;
+    border-radius:30px;
+    background:#00e0ff;
+    color:black;
+    font-weight:600;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+button:hover{
+    transform:scale(1.05);
+    background:#00bcd4;
+}
+
+.result{
+    margin-top:20px;
+    padding:10px;
+    border-radius:10px;
+    font-weight:600;
+}
+
+.mask{
+    background:#4caf50;
+}
+
+.nomask{
+    background:#f44336;
+}
+
+img{
+    margin-top:15px;
+    border-radius:15px;
+    width:200px;
+    box-shadow:0 5px 15px rgba(0,0,0,0.4);
+}
+
+footer{
+    margin-top:15px;
+    font-size:12px;
+    opacity:0.7;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1> Face Mask Detector</h1>
+<div class="subtitle">AI Powered CNN Model</div>
+
+<form method="POST" enctype="multipart/form-data">
+
+<label class="upload-box">
+ Click to Upload Image
+<input type="file" name="file" required>
+</label>
+
+<br>
+<button type="submit">Predict</button>
+
+</form>
+
+{% if result %}
+
+<div class="result {% if 'No' in result %}nomask{% else %}mask{% endif %}">
+{{ result }}
+</div>
+
+<img src="{{ img_path }}">
+
+{% endif %}
+
+<footer>
+Deep Learning Project • Flask Deployment
+</footer>
+
+</div>
+
+</body>
+</html>
