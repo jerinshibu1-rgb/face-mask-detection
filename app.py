@@ -2,14 +2,23 @@ from flask import Flask, render_template, request
 import tensorflow as tf
 import numpy as np
 import os
+import gdown
 from tensorflow.keras.preprocessing import image
+
+MODEL_URL = "https://drive.google.com/uc?id=1RO4StXQV0cPROkz5vDzdIbsCxKVcPFjl"
+MODEL_PATH = "cnn_facemask.keras"
+
+# download model if not exists (for Render cloud)
+if not os.path.exists(MODEL_PATH):
+    print("Downloading model from Google Drive...")
+    gdown.download(MODEL_URL, MODEL_PATH, quiet=False)
 
 app = Flask(__name__)
 
 # ===== MODEL PATH (SAFE WAY) =====
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 model_path = os.path.join(BASE_DIR, "model", "cnn_facemask.keras")
-model = tf.keras.models.load_model(model_path)
+model =  tf.keras.models.load_model(model_path)
 
 # ===== UPLOAD FOLDER (AUTO CREATE) =====
 UPLOAD_FOLDER = os.path.join(BASE_DIR, "static", "uploads")
