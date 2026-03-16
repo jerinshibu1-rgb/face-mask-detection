@@ -2,24 +2,21 @@ from flask import Flask, render_template, request
 import tensorflow as tf
 import numpy as np
 import os
-import gdown
+import urllib.request
 from tensorflow.keras.preprocessing import image
 
-# ================= MODEL DOWNLOAD =================
-MODEL_URL = "https://drive.google.com/uc?id=1RO4StXQV0cPROkz5vDzdIbsCxKVcPFjl"
+# ===== MODEL DOWNLOAD FROM HUGGINGFACE =====
+MODEL_URL = "https://huggingface.co/jerin96/face-mask-model/resolve/main/cnn_facemask.keras"
 MODEL_PATH = "cnn_facemask.keras"
 
-# Always download fresh model in cloud (avoids corrupted file)
-if os.path.exists(MODEL_PATH):
-    os.remove(MODEL_PATH)
+if not os.path.exists(MODEL_PATH):
+    print("Downloading model from HuggingFace...")
+    urllib.request.urlretrieve(MODEL_URL, MODEL_PATH)
 
-print("Downloading model from Google Drive...")
-gdown.download(MODEL_URL, MODEL_PATH, quiet=False, fuzzy=True)
-
-print("Loading CNN model...")
+print("Loading model...")
 model = tf.keras.models.load_model(MODEL_PATH)
 
-# ================= FLASK APP =================
+# ===== FLASK APP =====
 app = Flask(__name__)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -39,10 +36,10 @@ def predict_mask(img_path):
 
     if pred > 0.5:
         confidence = pred * 100
-        return f"No Mask ❌ ({confidence:.2f}%)"
+        return f"No Mask ({confidence:.2f}%)"
     else:
         confidence = (1 - pred) * 100
-        return f"Mask ✅ ({confidence:.2f}%)"
+        return f"Mask ({confidence:.2f}%)"
 
 
 @app.route("/", methods=["GET", "POST"])
