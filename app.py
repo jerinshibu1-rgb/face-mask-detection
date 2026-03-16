@@ -5,22 +5,21 @@ import os
 import gdown
 from tensorflow.keras.preprocessing import image
 
+# ================= MODEL DOWNLOAD =================
 MODEL_URL = "https://drive.google.com/uc?id=1RO4StXQV0cPROkz5vDzdIbsCxKVcPFjl"
 MODEL_PATH = "cnn_facemask.keras"
 
-# download model if not exists (for Render cloud)
 if not os.path.exists(MODEL_PATH):
     print("Downloading model from Google Drive...")
     gdown.download(MODEL_URL, MODEL_PATH, quiet=False)
 
+print("Loading CNN model...")
+model = tf.keras.models.load_model(MODEL_PATH)
+
+# ================= FLASK APP =================
 app = Flask(__name__)
 
-# ===== MODEL PATH (SAFE WAY) =====
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-model_path = os.path.join(BASE_DIR, "model", "cnn_facemask.keras")
-model =  tf.keras.models.load_model(model_path)
-
-# ===== UPLOAD FOLDER (AUTO CREATE) =====
 UPLOAD_FOLDER = os.path.join(BASE_DIR, "static", "uploads")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
@@ -28,7 +27,7 @@ app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 
 def predict_mask(img_path):
-    img = image.load_img(img_path, target_size=(224,224))
+    img = image.load_img(img_path, target_size=(224, 224))
     img = image.img_to_array(img)
     img = np.expand_dims(img, axis=0)
     img = img / 255.0
@@ -37,10 +36,10 @@ def predict_mask(img_path):
 
     if pred > 0.5:
         confidence = pred * 100
-        return f"No Mask  ({confidence:.2f}%)"
+        return f"No Mask ❌ ({confidence:.2f}%)"
     else:
         confidence = (1 - pred) * 100
-        return f"Mask  ({confidence:.2f}%)"
+        return f"Mask ✅ ({confidence:.2f}%)"
 
 
 @app.route("/", methods=["GET", "POST"])
