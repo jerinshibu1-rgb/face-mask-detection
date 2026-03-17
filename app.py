@@ -5,7 +5,7 @@ import os
 import urllib.request
 import tensorflow as tf
 
-MODEL_URL = "https://huggingface.co/jerin96/face-mask-model/resolve/main/cnn_facemask.keras"
+MODEL_URL = "https://huggingface.co/jerin96/face-mask-model/resolve/main/facemask.h5"
 MODEL_PATH = "cnn_facemask.keras"
 
 # download model if not exists
