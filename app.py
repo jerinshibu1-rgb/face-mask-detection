@@ -2,33 +2,40 @@ from flask import Flask, render_template, request
 import tensorflow as tf
 import numpy as np
 import os
-import urllib.request
-import tensorflow as tf
+import requests
+from tensorflow.keras.preprocessing import image
 
 MODEL_URL = "https://huggingface.co/jerin96/face-mask-model/resolve/main/facemask.h5"
-MODEL_PATH = "cnn_facemask.keras"
+MODEL_PATH = "facemask.h5"
 
-# download model if not exists
-if not os.path.exists(MODEL_PATH) or os.path.getsize(MODEL_PATH) < 1000000:
-    print("Downloading model from HuggingFace...")
-    urllib.request.urlretrieve(MODEL_URL, MODEL_PATH)
-    print("Download finished.")
-
-print("Loading model...")
-model = tf.keras.models.load_model(MODEL_PATH)
-print("Model loaded successfully.")
-
-# ===== FLASK APP =====
 app = Flask(__name__)
 
+# ===== Upload Folder =====
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(BASE_DIR, "static", "uploads")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+
+model = None   # ⭐ lazy global model
+
+
+def load_model_once():
+    global model
+
+    if model is None:
+        if not os.path.exists(MODEL_PATH):
+            print("Downloading model...")
+            r = requests.get(MODEL_URL)
+            open(MODEL_PATH, "wb").write(r.content)
+
+        print("Loading model...")
+        model = tf.keras.models.load_model(MODEL_PATH)
+        print("✅ Model loaded")
 
 
 def predict_mask(img_path):
+    load_model_once()
+
     img = image.load_img(img_path, target_size=(224, 224))
     img = image.img_to_array(img)
     img = np.expand_dims(img, axis=0)
@@ -37,11 +44,9 @@ def predict_mask(img_path):
     pred = model.predict(img)[0][0]
 
     if pred > 0.5:
-        confidence = pred * 100
-        return f"No Mask ({confidence:.2f}%)"
+        return f"No Mask ({pred*100:.2f}%)"
     else:
-        confidence = (1 - pred) * 100
-        return f"Mask ({confidence:.2f}%)"
+        return f"Mask ({(1-pred)*100:.2f}%)"
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -63,4 +68,4 @@ def index():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
+    app.run(host="0.0.0.0", port=10000)
