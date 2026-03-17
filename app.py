@@ -5,16 +5,19 @@ import os
 import urllib.request
 from tensorflow.keras.preprocessing import image
 
-# ===== MODEL DOWNLOAD FROM HUGGINGFACE =====
+print("Starting Face Mask App...")
+
 MODEL_URL = "https://huggingface.co/jerin96/face-mask-model/resolve/main/cnn_facemask.keras"
 MODEL_PATH = "cnn_facemask.keras"
 
 if not os.path.exists(MODEL_PATH):
     print("Downloading model from HuggingFace...")
     urllib.request.urlretrieve(MODEL_URL, MODEL_PATH)
+    print("Model download completed.")
 
 print("Loading model...")
 model = tf.keras.models.load_model(MODEL_PATH)
+print("Model loaded successfully.")
 
 # ===== FLASK APP =====
 app = Flask(__name__)
