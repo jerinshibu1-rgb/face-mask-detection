@@ -5,18 +5,20 @@ import os
 import requests
 from tensorflow.keras.preprocessing import image
 
+# ===== MODEL DOWNLOAD LINK (RAW) =====
 MODEL_URL = "https://huggingface.co/jerin96/face-mask-model/resolve/main/facemask.h5"
 MODEL_PATH = "facemask.h5"
 
 app = Flask(__name__)
 
-# ===== Upload Folder =====
+# ===== Upload Folder Setup =====
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(BASE_DIR, "static", "uploads")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
-model = None   # ⭐ lazy global model
+# ===== Lazy Global Model =====
+model = None
 
 
 def load_model_once():
@@ -26,11 +28,12 @@ def load_model_once():
         if not os.path.exists(MODEL_PATH):
             print("Downloading model...")
             r = requests.get(MODEL_URL)
-            open(MODEL_PATH, "wb").write(r.content)
+            with open(MODEL_PATH, "wb") as f:
+                f.write(r.content)
 
         print("Loading model...")
-        model = tf.keras.models.load_model(MODEL_PATH)
-        print("✅ Model loaded")
+        model = tf.keras.models.load_model(MODEL_PATH, compile=False)
+        print("✅ Model Loaded Successfully")
 
 
 def predict_mask(img_path):
