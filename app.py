@@ -3,17 +3,16 @@ import tensorflow as tf
 import numpy as np
 import os
 import urllib.request
-from tensorflow.keras.preprocessing import image
-
-print("Starting Face Mask App...")
+import tensorflow as tf
 
 MODEL_URL = "https://huggingface.co/jerin96/face-mask-model/resolve/main/cnn_facemask.keras"
 MODEL_PATH = "cnn_facemask.keras"
 
-if not os.path.exists(MODEL_PATH):
+# download model if not exists
+if not os.path.exists(MODEL_PATH) or os.path.getsize(MODEL_PATH) < 1000000:
     print("Downloading model from HuggingFace...")
     urllib.request.urlretrieve(MODEL_URL, MODEL_PATH)
-    print("Model download completed.")
+    print("Download finished.")
 
 print("Loading model...")
 model = tf.keras.models.load_model(MODEL_PATH)
